@@ -16,6 +16,7 @@ import de.ii.xtraplatform.features.domain.FeatureQuery;
 import de.ii.xtraplatform.features.domain.FeatureTransformer2;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -26,6 +27,8 @@ public interface TileFormatExtension extends FormatExtension {
     @Override
     default boolean isEnabledForApi(OgcApiDataV2 apiData) {
         return apiData.getExtension(TilesConfiguration.class)
+                      .filter(TilesConfiguration::getEnabled)
+                      .filter(TilesConfiguration::getMultiCollectionEnabled)
                       .filter(config -> config.getTileEncodings().contains(this.getMediaType().label()))
                       .isPresent();
     }
@@ -35,6 +38,8 @@ public interface TileFormatExtension extends FormatExtension {
         return apiData.getCollections()
                       .get(collectionId)
                       .getExtension(TilesConfiguration.class)
+                      .filter(TilesConfiguration::getEnabled)
+                      .filter(TilesConfiguration::getSingleCollectionEnabled)
                       .filter(config -> config.getTileEncodings().contains(this.getMediaType().label()))
                       .isPresent();
     }
@@ -65,7 +70,7 @@ public interface TileFormatExtension extends FormatExtension {
         boolean isComplete;
     }
 
-    MultiLayerTileContent combineSingleLayerTilesToMultiLayerTile(TileMatrixSet tileMatrixSet, Map<String, Tile> singleLayerTileMap, Map<String, ByteArrayOutputStream> singleLayerByteArrayMap);
+    MultiLayerTileContent combineSingleLayerTilesToMultiLayerTile(TileMatrixSet tileMatrixSet, Map<String, Tile> singleLayerTileMap, Map<String, ByteArrayOutputStream> singleLayerByteArrayMap) throws IOException;
 
     double getMaxAllowableOffsetNative(Tile tile);
     double getMaxAllowableOffsetCrs84(Tile tile);
