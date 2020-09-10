@@ -12,7 +12,6 @@ import de.ii.ldproxy.ogcapi.domain.ExtensionConfiguration;
 import de.ii.ldproxy.ogcapi.domain.Link;
 import org.immutables.value.Value;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 @Value.Immutable
@@ -24,6 +23,8 @@ public interface CommonConfiguration extends ExtensionConfiguration {
     }
 
     List<Link> getAdditionalLinks();
+
+    List<String> getAdditionalConformanceClasses();
 
     @Override
     default Builder getBuilder() {

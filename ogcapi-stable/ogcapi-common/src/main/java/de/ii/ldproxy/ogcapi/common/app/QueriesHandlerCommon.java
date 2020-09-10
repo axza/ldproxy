@@ -126,8 +126,9 @@ public class QueriesHandlerCommon implements QueriesHandler<QueriesHandlerCommon
 
     private Response getConformanceResponse(QueryInputConformance queryInput,
                                             ApiRequestContext requestContext) {
+        OgcApiDataV2 apiData = requestContext.getApi().getData();
         List<ConformanceClass> conformanceClasses = getConformanceClasses().stream()
-                                                                           .filter(conformanceClass -> conformanceClass.isEnabledForApi(requestContext.getApi().getData()))
+                                                                           .filter(conformanceClass -> conformanceClass.isEnabledForApi(apiData))
                                                                            .collect(Collectors.toList());
 
         List<Link> links = new ConformanceDeclarationLinksGenerator().generateLinks(
@@ -145,7 +146,8 @@ public class QueriesHandlerCommon implements QueriesHandler<QueriesHandlerCommon
                 .conformsTo(conformanceClasses.stream()
                                               .map(ConformanceClass::getConformanceClassUris)
                                               .flatMap(List::stream)
-                                              .collect(Collectors.toList()));
+                                              .collect(Collectors.toList()))
+                .addAllConformsTo(apiData.getExtension(CommonConfiguration.class).get().getAdditionalConformanceClasses());
 
         for (ConformanceDeclarationExtension ogcApiConformanceDeclarationExtension : getConformanceExtenders()) {
             conformanceDeclaration = ogcApiConformanceDeclarationExtension.process(conformanceDeclaration,
